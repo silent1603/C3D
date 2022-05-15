@@ -1,0 +1,47 @@
+cmake_minimum_required(VERSION 3.13)
+
+
+project(JD)
+
+
+
+
+
+
+set(PROJECT_PATH ${CMAKE_SOURCE_DIR}/JD)
+set(SRC_PATH ${PROJECT_PATH}/src)
+set(RESOURCE_PATH ${PROJECT_PATH}/res)
+
+file(GLOB_RECURSE PROJECT_SOURCES ${SRC_PATH}/*.cpp)
+file(GLOB_RECURSE PROJECT_HEADERS ${SRC_PATH}/*.h)
+file(GLOB_RECURSE PROJECT_RESOURCES ${RESOURCE_PATH}/*.*)
+
+source_group(TREE ${PROJECT_PATH} FILES ${PROJECT_SOURCES})
+source_group(TREE ${PROJECT_PATH} FILES ${PROJECT_HEADERS})
+source_group(TREE ${PROJECT_PATH} FILES ${PROJECT_RESOURCES})
+
+add_executable(JD ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
+
+set_property(TARGET JD PROPERTY CXX_STANDARD 11)
+
+target_include_directories(JD PRIVATE ${PROJECT_PATH} ) 
+
+if (MSVC)
+  set_target_properties(JD PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${RELEASE_PATH})
+elseif(UNIX AND NOT APPLE)
+  target_link_libraries(JD PRIVATE  X11  Xext )
+
+endif()
+
+add_custom_command(TARGET JD POST_BUILD 
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory 
+                      ${CMAKE_SOURCE_DIR}/JD/res ${RELEASE_PATH}/JD/res 
+)
+
+set_target_properties(JD PROPERTIES 
+           ARCHIVE_OUTPUT_DIRECTORY "${RELEASE_PATH}/JD/lib" 
+           LIBRARY_OUTPUT_DIRECTORY "${RELEASE_PATH}/JD/lib" 
+           RUNTIME_OUTPUT_DIRECTORY "${RELEASE_PATH}/JD" 
+           RUNTIME_OUTPUT_DIRECTORY_DEBUG "${RELEASE_PATH}/JD" 
+           RUNTIME_OUTPUT_DIRECTORY_RELEASE "${RELEASE_PATH}/JD" 
+)
